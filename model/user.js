@@ -1,5 +1,5 @@
-const mongoose = require("mongoose")
-const bcrypt = require("bcrypt")
+const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 
 const table = new mongoose.Schema({
     nomeusuario: {type:String},
@@ -14,8 +14,8 @@ const table = new mongoose.Schema({
 table.pre("save",function(next){
     let user = this;
     if(!user.isModified('senha')) return next()
-    bcrypt.hash(user.senha,10,(erro,encrypt)=>{
-        user.senha = encrypt
+    bcrypt.hash(user.senha,10,(erro,encr)=>{
+        user.senha = encr
         return next()
     })
 })

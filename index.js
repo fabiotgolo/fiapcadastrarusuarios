@@ -1,14 +1,14 @@
-const express = require("express")
-const cors = require("cors")
-const mongoose = require("mongoose")
-const Usuario = require("./model/user")
-const bcrypt = require("bcrypt")
-const createToken = require("./utils/token")
-const auth = require("./middleware/auth")
+const express = require("express");
+const cors = require("cors");
+const mongoose = require("mongoose");
+const Usuario = require("./model/user");
+const bcrypt = require("bcrypt");
+const createToken = require("./utils/token");
+const auth = require("./middleware/auth");
 const urlbd = "connection string";
 
 mongoose.connect(urlbd, { useNewUrlParser: true, useUnifiedTopology: true })
-.then(() => console.log('Conectado ao DB...'))
+.then(() => console.log('Conectado ao DB'))
 .catch((e) => console.log('erro -> ',e))
 
 const confCors = {
@@ -21,7 +21,7 @@ const app = express()
 app.use(express.json())
 app.use(cors())
 
-app.post("/api/user/cadastrar", cors(confCors),(req,res)=>{
+app.post("/api/usuario/cadastrar", cors(confCors),(req,res)=>{
     const data = new Usuario(req.body)
     data.save().then((rs)=>{
         res.status(201).send({
@@ -33,7 +33,7 @@ app.post("/api/user/cadastrar", cors(confCors),(req,res)=>{
     }))
 })
 
-app.post("/api/user/login",(req,res)=>{
+app.post("/api/usuario/login",(req,res)=>{
     const usuario = req.body.nome
     const senha = req.body.senha
 
@@ -55,7 +55,7 @@ app.post("/api/user/login",(req,res)=>{
                 const token = createToken(rs._id,rs.nomeusuario)
 
                 res.status(200).send({
-                    out:"Usuário logado",
+                    out:"Usuário Logado",
                     payload:rs,
                     token:token
                 })  
@@ -64,12 +64,11 @@ app.post("/api/user/login",(req,res)=>{
     })
 })
 
-app.put("/api/user/atualizar/:id", cors(confCors),auth,(req, res) => {
+app.put("/api/usuario/atualizar/:id", cors(confCors),auth,(req, res) => {
   
-    // Se enviar a senha na requisição ela será criptografada
     if(req.body.senha){
-        bcrypt.hash(req.body.senha,10,(erro,encrypt)=>{
-            req.body.senha = encrypt
+        bcrypt.hash(req.body.senha,10,(erro,encr)=>{
+            req.body.senha = encr
             Atualizar()
         })
     }else{
@@ -90,7 +89,7 @@ app.put("/api/user/atualizar/:id", cors(confCors),auth,(req, res) => {
                     })
                 } else {
                     res.status(200).send({
-                        output: "Atualizafo",
+                        output: "Atualizado",
                         payload: rs
                     })
                 }
@@ -99,7 +98,7 @@ app.put("/api/user/atualizar/:id", cors(confCors),auth,(req, res) => {
     }
 })
 
-app.delete("/api/user/delete/:id", cors(confCors), (req, res) => {
+app.delete("/api/usuario/delete/:id", cors(confCors), (req, res) => {
     Usuario.findByIdAndDelete(
         req.params.id,
         (erro, rs) => {
