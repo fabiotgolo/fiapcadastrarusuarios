@@ -5,10 +5,11 @@ const Usuario = require("./model/user");
 const bcrypt = require("bcrypt");
 const createToken = require("./utils/token");
 const auth = require("./middleware/auth");
-const urlbd = "connection string";
+const urlbd = "mongodb+srv://fabiotg:Ba123456@clustercliente.zbihk.mongodb.net/database?retryWrites=true&w=majority";
+//Professor, mantive o endereço aqui porque esse usuário e senha são provisórios, depois da avaliação vou deletar.
 
 mongoose.connect(urlbd, { useNewUrlParser: true, useUnifiedTopology: true })
-.then(() => console.log('Conectado ao DB'))
+.then(() => console.log('Conectado ao DB.'))
 .catch((e) => console.log('erro -> ',e))
 
 const confCors = {
@@ -25,11 +26,11 @@ app.post("/api/usuario/cadastrar", cors(confCors),(req,res)=>{
     const data = new Usuario(req.body)
     data.save().then((rs)=>{
         res.status(201).send({
-            out:'O usuário foi inserido com sucesso',
+            output:'O usuário foi inserido com sucesso',
             payload:rs
         })
     }).catch((erro)=>res.status(400).send({
-        out:`erro -> ${erro}`
+        output:`erro -> ${erro}`
     }))
 })
 
@@ -39,18 +40,18 @@ app.post("/api/usuario/login",(req,res)=>{
 
     Usuario.findOne({nomeusuario:usuario},(error,rs)=>{
         if(!rs){
-            return res.status(404).send({out:"Usuário inexistente"})
+            return res.status(404).send({output:"Usuário inexistente"})
         }
         if(error){
-             return res.status(400).send({out:"Usuário não encontrado"})
+             return res.status(400).send({output:"Usuário não encontrado"})
         }
         bcrypt.compare(senha,rs.senha,(error,same)=>{
             if(error){
-                return res.status(400).send({out:"Erro de senha"})
+                return res.status(400).send({output:"Erro de senha"})
             }
 
             if(!same){
-                return res.status(400).send({out: "Senha incorreta"})
+                return res.status(400).send({output: "Senha incorreta"})
             }else{
                 const token = createToken(rs._id,rs.nomeusuario)
 
@@ -78,15 +79,13 @@ app.put("/api/usuario/atualizar/:id", cors(confCors),auth,(req, res) => {
     function Atualizar(){
 
         Usuario.findByIdAndUpdate(
-            req.params.id,
-            req.body,
+            req.params.id, req.body,
             { new: true },
             (erro, rs) => {
                 if (erro) {
                     return res.status(400).send({
                         output: "Erro ao Atualizar",
-                        error: erro
-                    })
+                        err:erro})
                 } else {
                     res.status(200).send({
                         output: "Atualizado",
@@ -105,8 +104,7 @@ app.delete("/api/usuario/delete/:id", cors(confCors), (req, res) => {
             if (erro) {
                 return res.status(400).send({
                     output: "Erro ao Deletar",
-                    error: erro
-                })
+                    err:erro})
             } else {
                 res.status(204).send({
                     output: "Deletou"
@@ -124,5 +122,5 @@ app.use((req, res) => {
 })
 
 
-app.listen(4000, () => console.log('Rodando na porta 4000'))
+app.listen(3000, () => console.log('Rodando na porta 3000'));
 
